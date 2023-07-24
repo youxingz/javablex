@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+}
+
+group 'io.javablex'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    // https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform
+    implementation 'net.java.dev.jna:jna-platform:5.13.0'
+    // https://mvnrepository.com/artifact/net.java.dev.jna/jna
+    implementation 'net.java.dev.jna:jna:5.13.0'
+}
+
+test {
+    useJUnitPlatform()
+}
