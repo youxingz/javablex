@@ -2,6 +2,7 @@ package io.javablex;
 
 import com.sun.jna.Callback;
 import com.sun.jna.Library;
+import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
 
 import java.io.IOException;
@@ -11,7 +12,15 @@ public class BlexProxy {
 
     protected BlexProxy() {
         try {
-            instance = NativeUtils.loadLibraryFromJar("/lib/libblex.dylib", Lib.class);
+            String file = "/lib/libblex";
+            if (Platform.isWindows()) {
+                file += ".dll";
+            } else if (Platform.isMac()) {
+                file += ".dylib";
+            } else if (Platform.isLinux()) {
+                file += ".so";
+            }
+            instance = NativeUtils.loadLibraryFromJar(file, Lib.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
