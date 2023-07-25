@@ -1,16 +1,13 @@
-package io.javablex;
+package io.javablex.nativex;
 
-import com.sun.jna.Callback;
-import com.sun.jna.Library;
-import com.sun.jna.Platform;
-import com.sun.jna.Pointer;
+import com.sun.jna.*;
 
 import java.io.IOException;
 
 public class BlexProxy {
-    private Lib instance;
+    private static Lib instance;
 
-    protected BlexProxy() {
+    static {
         try {
             String file = "/lib/libblex";
             if (Platform.isWindows()) {
@@ -26,7 +23,7 @@ public class BlexProxy {
         }
     }
 
-    public Lib getInstance() {
+    public static Lib getInstance() {
         return instance;
     }
 
@@ -40,7 +37,7 @@ public class BlexProxy {
     }
 
     public static interface NotifyCallback extends Callback {
-        int invoke(Blex.BlexUUID service, Blex.BlexUUID characteristic, byte[] data, int data_length, Pointer userdata);
+        int invoke(BlexUUID service, BlexUUID characteristic, byte[] data, int data_length, Pointer userdata);
     }
 
     public static interface PeripheralConnectionCallback extends Callback {
@@ -119,31 +116,31 @@ public class BlexProxy {
 
         int blexPeripheralGetServicesCount(Pointer handle);
 
-        int blexPeripheralGetServices(Pointer handle, int index, Blex.BlexService[] services);
+        int blexPeripheralGetServices(Pointer handle, int index, BlexService services);
 
         int blexPeripheralManufacturerDataCount(Pointer handle);
 
-        int blexPeripheralManufacturerDataGet(Pointer handle, int index, Blex.BlexManufacturerData[] manufacturer_data);
+        int blexPeripheralManufacturerDataGet(Pointer handle, int index, BlexManufacturerData manufacturer_data);
 
-        int blexPeripheralRead(Pointer handle, Blex.BlexUUID service, Blex.BlexUUID characteristic, byte[] data, // uint8_t**
+        int blexPeripheralRead(Pointer handle, BlexUUID service, BlexUUID characteristic, Pointer data, // uint8_t**
                                Pointer data_length);
 
-        int blexPeripheralWriteRequest(Pointer handle, Blex.BlexUUID service, Blex.BlexUUID characteristic, byte[] data, // const uint8_t* data,
+        int blexPeripheralWriteRequest(Pointer handle, BlexUUID service, BlexUUID characteristic, byte[] data, // const uint8_t* data,
                                        int data_length);
 
-        int blexPeripheralWriteCommand(Pointer handle, Blex.BlexUUID service, Blex.BlexUUID characteristic, byte[] data, // const uint8_t* data,
+        int blexPeripheralWriteCommand(Pointer handle, BlexUUID service, BlexUUID characteristic, byte[] data, // const uint8_t* data,
                                        int data_length);
 
-        int blexPeripheralNotify(Pointer handle, Blex.BlexUUID service, Blex.BlexUUID characteristic, NotifyCallback callback, Pointer userdata);
+        int blexPeripheralNotify(Pointer handle, BlexUUID service, BlexUUID characteristic, NotifyCallback callback, Pointer userdata);
 
-        int blexPeripheralIndicate(Pointer handle, Blex.BlexUUID service, Blex.BlexUUID characteristic, NotifyCallback callback, Pointer userdata);
+        int blexPeripheralIndicate(Pointer handle, BlexUUID service, BlexUUID characteristic, NotifyCallback callback, Pointer userdata);
 
-        int blexPeripheralUnsubscribe(Pointer handle, Blex.BlexUUID service, Blex.BlexUUID characteristic);
+        int blexPeripheralUnsubscribe(Pointer handle, BlexUUID service, BlexUUID characteristic);
 
-        int blexPeripheralReadDescriptor(Pointer handle, Blex.BlexUUID service, Blex.BlexUUID characteristic, Blex.BlexUUID descriptor, byte[][] data, // uint8_t** data,
+        int blexPeripheralReadDescriptor(Pointer handle, BlexUUID service, BlexUUID characteristic, BlexUUID descriptor, Pointer data, // uint8_t** data,
                                          Pointer data_length);
 
-        int blexPeripheralWriteDescriptor(Pointer handle, Blex.BlexUUID service, Blex.BlexUUID characteristic, Blex.BlexUUID descriptor, byte[] data, // const uint8_t* data,
+        int blexPeripheralWriteDescriptor(Pointer handle, BlexUUID service, BlexUUID characteristic, BlexUUID descriptor, byte[] data, // const uint8_t* data,
                                           int data_length);
 
         int blexPeripheralSetCallbackOnConnected(Pointer handle, PeripheralConnectionCallback callback, Pointer userdata);
@@ -151,4 +148,39 @@ public class BlexProxy {
         int blexPeripheralSetCallbackOnDisconnected(Pointer handle, PeripheralConnectionCallback callback, Pointer userdata);
     }
 
+
+    public static class BlexService extends Structure {
+
+        public BlexUUID uuid;
+        public int data_length;
+        public byte[] data; // size: 27
+        public int characteristic_count;
+        public BlexCharacteristic[] characteristics; // BLEX_CHARACTERISTIC_MAX_COUNT
+    }
+
+    public static class BlexCharacteristic extends Structure {
+
+        public BlexUUID uuid;
+        public boolean can_read;
+        public boolean can_write_request;
+        public boolean can_write_command;
+        public boolean can_notify;
+        public boolean can_indicate;
+        public int descriptor_count;
+        public BlexDescriptor descriptors[]; // BLEX_DESCRIPTOR_MAX_COUNT
+    }
+
+    public static class BlexDescriptor extends Structure {
+        public BlexUUID uuid;
+    }
+
+    public static class BlexManufacturerData extends Structure {
+        public int manufacturer_id;
+        public int data_length;
+        public byte data[]; // 27
+    }
+
+    public static class BlexUUID extends Structure {
+        public byte[] value; // SIMPLEBLE_UUID_STR_LEN
+    }
 }

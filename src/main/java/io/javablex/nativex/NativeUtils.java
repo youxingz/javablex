@@ -1,4 +1,4 @@
-package io.javablex;
+package io.javablex.nativex;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;
