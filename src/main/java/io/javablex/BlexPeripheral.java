@@ -135,7 +135,8 @@ public class BlexPeripheral {
         return 0 == proxy.blexPeripheralNotify(pointer, service.struct, characteristic.struct, new BlexProxy.NotifyCallback() {
             @Override
             public int invoke(BlexProxy.BlexUUID service, BlexProxy.BlexUUID characteristic, byte[] data, int data_length, Pointer userdata) {
-                return callback.onNotify(new BlexUUID(service), new BlexUUID(characteristic), data, data_length, false);
+                callback.onNotify(new BlexUUID(service), new BlexUUID(characteristic), data, data_length, false);
+                return 0;
             }
         }, Pointer.NULL);
     }
@@ -144,7 +145,8 @@ public class BlexPeripheral {
         return 0 == proxy.blexPeripheralIndicate(pointer, service.struct, characteristic.struct, new BlexProxy.NotifyCallback() {
             @Override
             public int invoke(BlexProxy.BlexUUID service, BlexProxy.BlexUUID characteristic, byte[] data, int data_length, Pointer userdata) {
-                return callback.onNotify(new BlexUUID(service), new BlexUUID(characteristic), data, data_length, true);
+                callback.onNotify(new BlexUUID(service), new BlexUUID(characteristic), data, data_length, true);
+                return 0;
             }
         }, Pointer.NULL);
     }
@@ -176,14 +178,16 @@ public class BlexPeripheral {
         boolean success = 0 == proxy.blexPeripheralSetCallbackOnConnected(pointer, new BlexProxy.PeripheralConnectionCallback() {
             @Override
             public int invoke(Pointer peripheral, Pointer userdata) {
-                return callback.onConnection(BlexPeripheral.this);
+                callback.onConnection(BlexPeripheral.this);
+                return 0;
             }
         }, Pointer.NULL);
         if (success) {
             success = 0 == proxy.blexPeripheralSetCallbackOnDisconnected(pointer, new BlexProxy.PeripheralConnectionCallback() {
                 @Override
                 public int invoke(Pointer peripheral, Pointer userdata) {
-                    return callback.onConnection(BlexPeripheral.this);
+                    callback.onConnection(BlexPeripheral.this);
+                    return 0;
                 }
             }, Pointer.NULL);
         }
@@ -199,11 +203,11 @@ public class BlexPeripheral {
     }
 
     public interface NotifyCallback {
-        int onNotify(BlexUUID service, BlexUUID characteristic, byte[] data, int data_length, boolean isIndication);
+        void onNotify(BlexUUID service, BlexUUID characteristic, byte[] data, int data_length, boolean isIndication);
     }
 
     public interface PeripheralConnectionCallback {
-        int onConnection(BlexPeripheral peripheral);
+        void onConnection(BlexPeripheral peripheral);
     }
 
     public enum AddressType {
