@@ -3,6 +3,8 @@ package io.javablex.nativex;
 import com.sun.jna.*;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 public class BlexProxy {
     private static Lib instance;
@@ -150,15 +152,22 @@ public class BlexProxy {
 
 
     public static class BlexService extends Structure {
+        private static final List<String> FIELDS = Arrays.asList("uuid", "data_length", "data", "characteristic_count", "characteristics");
 
         public BlexUUID uuid;
         public int data_length;
-        public byte[] data; // size: 27
+        public byte[] data = new byte[27]; // size: 27
         public int characteristic_count;
-        public BlexCharacteristic[] characteristics; // BLEX_CHARACTERISTIC_MAX_COUNT
+        public BlexCharacteristic[] characteristics = new BlexCharacteristic[16]; // BLEX_CHARACTERISTIC_MAX_COUNT
+
+        @Override
+        protected List<String> getFieldOrder() {
+            return FIELDS;
+        }
     }
 
     public static class BlexCharacteristic extends Structure {
+        private static final List<String> FIELDS = Arrays.asList("uuid", "can_read", "can_write_request", "can_write_command", "can_notify", "can_indicate", "descriptor_count", "descriptors");
 
         public BlexUUID uuid;
         public boolean can_read;
@@ -167,20 +176,46 @@ public class BlexProxy {
         public boolean can_notify;
         public boolean can_indicate;
         public int descriptor_count;
-        public BlexDescriptor descriptors[]; // BLEX_DESCRIPTOR_MAX_COUNT
+        public BlexDescriptor descriptors[] = new BlexDescriptor[16]; // BLEX_DESCRIPTOR_MAX_COUNT
+
+        @Override
+        protected List<String> getFieldOrder() {
+            return FIELDS;
+        }
     }
 
     public static class BlexDescriptor extends Structure {
+        private static final List<String> FIELDS = Arrays.asList("uuid");
         public BlexUUID uuid;
+
+        @Override
+        protected List<String> getFieldOrder() {
+            return FIELDS;
+        }
     }
 
     public static class BlexManufacturerData extends Structure {
+        private static final List<String> FIELDS = Arrays.asList("data", "data_length", "manufacturer_id");
         public int manufacturer_id;
         public int data_length;
-        public byte data[]; // 27
+        public byte data[] = new byte[27]; // 27
+
+        @Override
+        protected List<String> getFieldOrder() {
+            return FIELDS;
+        }
     }
 
     public static class BlexUUID extends Structure {
-        public byte[] value; // SIMPLEBLE_UUID_STR_LEN
+        private static final List<String> FIELDS = Arrays.asList("value");
+        public byte[] value = new byte[37]; // SIMPLEBLE_UUID_STR_LEN
+
+        public BlexUUID() {
+        }
+
+        @Override
+        protected List<String> getFieldOrder() {
+            return FIELDS;
+        }
     }
 }

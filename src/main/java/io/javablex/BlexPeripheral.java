@@ -3,7 +3,11 @@ package io.javablex;
 import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
 import io.javablex.nativex.BlexProxy;
+import io.javablex.nativex.BlexProxy.BlexUUID;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public class BlexPeripheral {
@@ -374,13 +378,32 @@ public class BlexPeripheral {
             this.value = uuid.value;
         }
 
+        public BlexUUID(UUID uuid) {
+            struct = new BlexProxy.BlexUUID();
+            struct.value = asBytes(uuid);
+        }
+
         @Override
         public String toString() {
             return getUuid().toString();
         }
 
-        public UUID getUuid() {
-            return UUID.nameUUIDFromBytes(struct.value);
+        private UUID getUuid() {
+            return asUuid(struct.value);
+        }
+
+        private static UUID asUuid(byte[] bytes) {
+            ByteBuffer bb = ByteBuffer.wrap(bytes);
+            long firstLong = bb.getLong();
+            long secondLong = bb.getLong();
+            return new UUID(firstLong, secondLong);
+        }
+
+        private static byte[] asBytes(UUID uuid) {
+            ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
+            bb.putLong(uuid.getMostSignificantBits());
+            bb.putLong(uuid.getLeastSignificantBits());
+            return bb.array();
         }
     }
 }
