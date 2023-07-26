@@ -178,7 +178,7 @@ public class BlexPeripheral {
         boolean success = 0 == proxy.blexPeripheralSetCallbackOnConnected(pointer, new BlexProxy.PeripheralConnectionCallback() {
             @Override
             public int invoke(Pointer peripheral, Pointer userdata) {
-                callback.onConnection(BlexPeripheral.this);
+                callback.onConnection(BlexPeripheral.this, true);
                 return 0;
             }
         }, Pointer.NULL);
@@ -186,7 +186,7 @@ public class BlexPeripheral {
             success = 0 == proxy.blexPeripheralSetCallbackOnDisconnected(pointer, new BlexProxy.PeripheralConnectionCallback() {
                 @Override
                 public int invoke(Pointer peripheral, Pointer userdata) {
-                    callback.onConnection(BlexPeripheral.this);
+                    callback.onConnection(BlexPeripheral.this, false);
                     return 0;
                 }
             }, Pointer.NULL);
@@ -207,7 +207,7 @@ public class BlexPeripheral {
     }
 
     public interface PeripheralConnectionCallback {
-        void onConnection(BlexPeripheral peripheral);
+        void onConnection(BlexPeripheral peripheral, boolean isConnected);
     }
 
     public enum AddressType {
