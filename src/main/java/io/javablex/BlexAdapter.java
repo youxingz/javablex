@@ -1,6 +1,5 @@
 package io.javablex;
 
-import com.sun.jna.Callback;
 import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
 import io.javablex.nativex.BlexProxy;
@@ -109,7 +108,7 @@ public class BlexAdapter {
         return success;
     }
 
-    public interface AdapterScanCallback extends Callback {
+    public interface AdapterScanCallback {
         void onScanStart(BlexAdapter adapter);
 
         void onScanStop(BlexAdapter adapter);
