@@ -3,11 +3,8 @@ package io.javablex;
 import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
 import io.javablex.nativex.BlexProxy;
-import io.javablex.nativex.BlexProxy.BlexUUID;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public class BlexPeripheral {

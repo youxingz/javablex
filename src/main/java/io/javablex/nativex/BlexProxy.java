@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class BlexProxy {
-    private static Lib instance;
+    private static final Lib instance;
 
     static {
         try {
@@ -15,7 +15,11 @@ public class BlexProxy {
             if (Platform.isWindows()) {
                 file += ".dll";
             } else if (Platform.isMac()) {
-                file += ".dylib";
+                if (Platform.isIntel()) {
+                    file += "_x86_64.dylib"; // Intel
+                } else {
+                    file += "_arm64.dylib"; // M1
+                }
             } else if (Platform.isLinux()) {
                 file += ".so";
             }
