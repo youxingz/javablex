@@ -213,7 +213,6 @@ public class BlexProxy {
     public static class BlexUUID extends Structure {
         private static final List<String> FIELDS = Arrays.asList("value");
         public byte[] value = new byte[37]; // SIMPLEBLE_UUID_STR_LEN
-
         public BlexUUID() {
         }
 

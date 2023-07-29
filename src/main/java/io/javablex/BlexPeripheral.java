@@ -5,6 +5,7 @@ import com.sun.jna.Pointer;
 import io.javablex.nativex.BlexProxy;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public class BlexPeripheral {
@@ -230,8 +231,8 @@ public class BlexPeripheral {
             this.dataLength = service.data_length;
             this.data = service.data;
             this.characteristicCount = service.characteristic_count;
-            this.characteristics = new BlexCharacteristic[service.characteristics.length];
-            for (int i = 0; i < service.characteristics.length; i++) {
+            this.characteristics = new BlexCharacteristic[service.characteristic_count];
+            for (int i = 0; i < service.characteristic_count; i++) {
                 this.characteristics[i] = new BlexCharacteristic(service.characteristics[i]);
             }
         }
@@ -277,8 +278,8 @@ public class BlexPeripheral {
             this.canNotify = characteristic.can_notify;
             this.canIndicate = characteristic.can_indicate;
             this.descriptorCount = characteristic.descriptor_count;
-            this.descriptors = new BlexDescriptor[characteristic.descriptors.length];
-            for (int i = 0; i < characteristic.descriptors.length; i++) {
+            this.descriptors = new BlexDescriptor[characteristic.descriptor_count];
+            for (int i = 0; i < characteristic.descriptor_count; i++) {
                 this.descriptors[i] = new BlexDescriptor(characteristic.descriptors[i]);
             }
         }
@@ -367,40 +368,23 @@ public class BlexPeripheral {
     }
 
     public static class BlexUUID {
-        byte value[]; // SIMPLEBLE_UUID_STR_LEN
+        String value; // SIMPLEBLE_UUID_STR_LEN
         private BlexProxy.BlexUUID struct;
 
         private BlexUUID(BlexProxy.BlexUUID uuid) {
             this.struct = uuid;
-            this.value = uuid.value;
+            this.value = new String(struct.value, 0, 36);
         }
 
-        public BlexUUID(UUID uuid) {
+        public BlexUUID(String uuid) {
+            this.value = uuid.toLowerCase();
             struct = new BlexProxy.BlexUUID();
-            struct.value = asBytes(uuid);
+            System.arraycopy(this.value.getBytes(StandardCharsets.US_ASCII), 0, struct.value, 0, 36);
         }
 
         @Override
         public String toString() {
-            return getUuid().toString();
-        }
-
-        private UUID getUuid() {
-            return asUuid(struct.value);
-        }
-
-        private static UUID asUuid(byte[] bytes) {
-            ByteBuffer bb = ByteBuffer.wrap(bytes);
-            long firstLong = bb.getLong();
-            long secondLong = bb.getLong();
-            return new UUID(firstLong, secondLong);
-        }
-
-        private static byte[] asBytes(UUID uuid) {
-            ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
-            bb.putLong(uuid.getMostSignificantBits());
-            bb.putLong(uuid.getLeastSignificantBits());
-            return bb.array();
+            return value;
         }
     }
 }
