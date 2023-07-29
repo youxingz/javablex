@@ -6,6 +6,7 @@ import io.javablex.nativex.BlexProxy;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.UUID;
 
 public class BlexPeripheral {
@@ -385,6 +386,19 @@ public class BlexPeripheral {
         @Override
         public String toString() {
             return value;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            BlexUUID blexUUID = (BlexUUID) o;
+            return Objects.equals(value, blexUUID.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(value);
         }
     }
 }
