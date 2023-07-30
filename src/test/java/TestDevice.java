@@ -19,7 +19,7 @@ public class TestDevice {
         if (characteristics.length == 0) return;
         peripheral.notify(service.getUuid(), characteristics[0].getUuid(), new BlexPeripheral.NotifyCallback() {
             @Override
-            public void onNotify(BlexPeripheral.BlexUUID service, BlexPeripheral.BlexUUID characteristic, byte[] data, int data_length, boolean isIndication) {
+            public void onNotify(BlexPeripheral.BlexUUID service, BlexPeripheral.BlexUUID characteristic, byte[] data, boolean isIndication) {
                 System.out.println("Data income: ");
                 System.out.println(Arrays.toString(data));
             }

@@ -2,6 +2,8 @@ import com.sun.jna.Native;
 import io.javablex.BlexAdapter;
 import io.javablex.BlexPeripheral;
 
+import java.util.Arrays;
+
 public class Test3 {
     private static BlexPeripheral device;
 
@@ -62,10 +64,25 @@ public class Test3 {
 //        byte[] cmd = {0x02};
         BlexPeripheral.BlexService service = device.getServices(0);
         BlexPeripheral.BlexCharacteristic characteristic = service.getCharacteristics()[0];
+        BlexPeripheral.BlexCharacteristic notifyChar = service.getCharacteristics()[2];
         System.out.println("CMD sending...");
         device.writeCommand(service.getUuid(), characteristic.getUuid(), cmd, cmd.length);
 //        device.writeCommand(new BlexPeripheral.BlexUUID("0000fade-0000-1000-8000-00805f9b34fb"), new BlexPeripheral.BlexUUID("0000fad1-0000-1000-8000-00805f9b34fb"), cmd, cmd.length);
         System.out.println("CMD sent.");
 //        Thread.sleep(100000);
+        device.notify(service.getUuid(), notifyChar.getUuid(), new BlexPeripheral.NotifyCallback() {
+            @Override
+            public void onNotify(BlexPeripheral.BlexUUID service, BlexPeripheral.BlexUUID characteristic, byte[] data, boolean isIndication) {
+                System.out.println("==========notify=========");
+                System.out.println("Length: " + data.length);
+                System.out.println(Arrays.toString(data));
+            }
+        });
+        while (true) {
+            String cmdHeartStr = "{\"cmd\":4,\"secret\":\"xxsecret\",\"ts\":" + System.currentTimeMillis() + "}";
+            byte[] cmdHeart = cmdHeartStr.getBytes();
+            device.writeCommand(service.getUuid(), characteristic.getUuid(), cmdHeart, cmdHeart.length);
+            Thread.sleep(1000);
+        }
     }
 }

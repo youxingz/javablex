@@ -135,21 +135,27 @@ public class BlexPeripheral {
     public boolean notify(BlexUUID service, BlexUUID characteristic, NotifyCallback callback) {
         return 0 == proxy.blexPeripheralNotify(pointer, service.value, characteristic.value, new BlexProxy.NotifyCallback() {
             @Override
-            public int invoke(BlexProxy.BlexUUID service, BlexProxy.BlexUUID characteristic, byte[] data, long data_length, Pointer userdata) {
-                callback.onNotify(new BlexUUID(service), new BlexUUID(characteristic), data, (int) data_length, false);
+            public int invoke(String service_, String characteristic_, Pointer dataPointer, long data_length) {
+                byte[] data = new byte[(int) data_length];
+                for (int i = 0; i < data.length; i++)
+                    data[i] = dataPointer.getByte(i);
+                callback.onNotify(service, characteristic, data, false);
                 return 0;
             }
-        }, Pointer.NULL);
+        });
     }
 
     public boolean indicate(BlexUUID service, BlexUUID characteristic, NotifyCallback callback) {
         return 0 == proxy.blexPeripheralIndicate(pointer, service.value, characteristic.value, new BlexProxy.NotifyCallback() {
             @Override
-            public int invoke(BlexProxy.BlexUUID service, BlexProxy.BlexUUID characteristic, byte[] data, long data_length, Pointer userdata) {
-                callback.onNotify(new BlexUUID(service), new BlexUUID(characteristic), data, (int) data_length, true);
+            public int invoke(String service_, String characteristic_, Pointer dataPointer, long data_length) {
+                byte[] data = new byte[(int) data_length];
+                for (int i = 0; i < data.length; i++)
+                    data[i] = dataPointer.getByte(i);
+                callback.onNotify(service, characteristic, data, true);
                 return 0;
             }
-        }, Pointer.NULL);
+        });
     }
 
     public boolean unsubscribe(BlexUUID service, BlexUUID characteristic) {
@@ -204,7 +210,7 @@ public class BlexPeripheral {
     }
 
     public interface NotifyCallback {
-        void onNotify(BlexUUID service, BlexUUID characteristic, byte[] data, int data_length, boolean isIndication);
+        void onNotify(BlexUUID service, BlexUUID characteristic, byte[] data, boolean isIndication);
     }
 
     public interface PeripheralConnectionCallback {

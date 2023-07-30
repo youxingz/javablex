@@ -44,7 +44,7 @@ public class BlexProxy {
     }
 
     public static interface NotifyCallback extends Callback {
-        int invoke(BlexUUID service, BlexUUID characteristic, byte[] data, long data_length, Pointer userdata);
+        int invoke(String serviceUUID, String characteristicUUID, Pointer data, long data_length);
     }
 
     public static interface PeripheralConnectionCallback extends Callback {
@@ -135,9 +135,9 @@ public class BlexProxy {
 
         int blexPeripheralWriteCommand(Pointer handle, String service, String characteristic, long data_length, byte[] data);
 
-        int blexPeripheralNotify(Pointer handle, String service, String characteristic, NotifyCallback callback, Pointer userdata);
+        int blexPeripheralNotify(Pointer handle, String service, String characteristic, NotifyCallback callback);
 
-        int blexPeripheralIndicate(Pointer handle, String service, String characteristic, NotifyCallback callback, Pointer userdata);
+        int blexPeripheralIndicate(Pointer handle, String service, String characteristic, NotifyCallback callback);
 
         int blexPeripheralUnsubscribe(Pointer handle, String service, String characteristic);
 
