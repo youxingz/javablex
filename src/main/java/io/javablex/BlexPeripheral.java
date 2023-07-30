@@ -4,10 +4,10 @@ import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
 import io.javablex.nativex.BlexProxy;
 
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 public class BlexPeripheral {
     private Pointer pointer;
@@ -229,11 +229,12 @@ public class BlexPeripheral {
 
         private BlexService(BlexProxy.BlexService service) {
             this.uuid = new BlexUUID(service.uuid);
-            this.dataLength = service.data_length;
-            this.data = service.data;
-            this.characteristicCount = service.characteristic_count;
-            this.characteristics = new BlexCharacteristic[service.characteristic_count];
-            for (int i = 0; i < service.characteristic_count; i++) {
+            this.dataLength = service.data_length.intValue();
+            this.data = new byte[(int) this.dataLength];
+            System.arraycopy(service.data, 0, this.data, 0, this.dataLength);
+            this.characteristicCount = service.characteristic_count.intValue();
+            this.characteristics = new BlexCharacteristic[this.characteristicCount];
+            for (int i = 0; i < this.characteristicCount; i++) {
                 this.characteristics[i] = new BlexCharacteristic(service.characteristics[i]);
             }
         }
@@ -243,7 +244,7 @@ public class BlexPeripheral {
         }
 
         public int getDataLength() {
-            return dataLength;
+            return (int) dataLength;
         }
 
         public byte[] getData() {
@@ -273,16 +274,34 @@ public class BlexPeripheral {
 
         private BlexCharacteristic(BlexProxy.BlexCharacteristic characteristic) {
             this.uuid = new BlexUUID(characteristic.uuid);
-            this.canRead = characteristic.can_read;
-            this.canWriteRequest = characteristic.can_write_request;
-            this.canWriteCommand = characteristic.can_write_command;
-            this.canNotify = characteristic.can_notify;
-            this.canIndicate = characteristic.can_indicate;
-            this.descriptorCount = characteristic.descriptor_count;
-            this.descriptors = new BlexDescriptor[characteristic.descriptor_count];
-            for (int i = 0; i < characteristic.descriptor_count; i++) {
+            this.canRead = characteristic.can_read.intValue() == 1;
+            this.canWriteRequest = characteristic.can_write_request.intValue() == 1;
+            this.canWriteCommand = characteristic.can_write_command.intValue() == 1;
+            this.canNotify = characteristic.can_notify.intValue() == 1;
+            this.canIndicate = characteristic.can_indicate.intValue() == 1;
+            this.descriptorCount = characteristic.descriptor_count.intValue();
+            this.descriptors = new BlexDescriptor[this.descriptorCount];
+            for (int i = 0; i < this.descriptorCount; i++) {
                 this.descriptors[i] = new BlexDescriptor(characteristic.descriptors[i]);
             }
+            // depr
+            // descriptor_count 值不对，jna 映射 structure 问题，改为遍历验证
+//            List<BlexDescriptor> descriptorList = new ArrayList<>();
+//            for (BlexProxy.BlexDescriptor descriptor : characteristic.descriptors) {
+//                boolean isValid = false;
+//                for (byte v : descriptor.uuid.value) {
+//                    if (v != 0) {
+//                        isValid = true;
+//                    }
+//                }
+//                if (isValid) {
+//                    descriptorList.add(new BlexDescriptor(descriptor));
+//                } else {
+//                    break; // 一般如果遇到 false 就表示此后都无有效的 desc 了
+//                }
+//            }
+//            this.descriptorCount = descriptorList.size();
+//            this.descriptors = descriptorList.toArray(new BlexDescriptor[this.descriptorCount]);
         }
 
         public BlexUUID getUuid() {
@@ -351,8 +370,9 @@ public class BlexPeripheral {
 
         private BlexManufacturerData(BlexProxy.BlexManufacturerData manufacturerData) {
             this.manufacturerId = manufacturerData.manufacturer_id;
-            this.dataLength = manufacturerData.data_length;
-            this.data = manufacturerData.data;
+            this.dataLength = manufacturerData.data_length.intValue();
+            this.data = new byte[this.dataLength];
+            System.arraycopy(manufacturerData.data, 0, this.data, 0, this.dataLength);
         }
 
         public int getManufacturerId() {
@@ -369,17 +389,19 @@ public class BlexPeripheral {
     }
 
     public static class BlexUUID {
-        String value; // SIMPLEBLE_UUID_STR_LEN
+        String value; // len: 36
         private BlexProxy.BlexUUID struct;
 
         private BlexUUID(BlexProxy.BlexUUID uuid) {
             this.struct = uuid;
+//            this.value = struct.value.substring(0, 36);
             this.value = new String(struct.value, 0, 36);
         }
 
         public BlexUUID(String uuid) {
             this.value = uuid.toLowerCase();
             struct = new BlexProxy.BlexUUID();
+//            struct.value = this.value + '\0';
             System.arraycopy(this.value.getBytes(StandardCharsets.US_ASCII), 0, struct.value, 0, 36);
         }
 

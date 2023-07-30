@@ -156,12 +156,13 @@ public class BlexProxy {
 
 
     public static class BlexService extends Structure {
+        //        public static class ByReference extends BlexService implements Structure.ByReference { }
         private static final List<String> FIELDS = Arrays.asList("uuid", "data_length", "data", "characteristic_count", "characteristics");
 
         public BlexUUID uuid;
-        public int data_length;
+        public SizeT data_length;
         public byte[] data = new byte[27]; // size: 27
-        public int characteristic_count;
+        public SizeT characteristic_count;
         public BlexCharacteristic[] characteristics = new BlexCharacteristic[16]; // BLEX_CHARACTERISTIC_MAX_COUNT
 
         @Override
@@ -174,13 +175,13 @@ public class BlexProxy {
         private static final List<String> FIELDS = Arrays.asList("uuid", "can_read", "can_write_request", "can_write_command", "can_notify", "can_indicate", "descriptor_count", "descriptors");
 
         public BlexUUID uuid;
-        public boolean can_read;
-        public boolean can_write_request;
-        public boolean can_write_command;
-        public boolean can_notify;
-        public boolean can_indicate;
-        public int descriptor_count;
-        public BlexDescriptor descriptors[] = new BlexDescriptor[16]; // BLEX_DESCRIPTOR_MAX_COUNT
+        public BoolT can_read;
+        public BoolT can_write_request;
+        public BoolT can_write_command;
+        public BoolT can_notify;
+        public BoolT can_indicate;
+        public SizeT descriptor_count;
+        public BlexDescriptor[] descriptors = new BlexDescriptor[16]; // BLEX_DESCRIPTOR_MAX_COUNT
 
         @Override
         protected List<String> getFieldOrder() {
@@ -200,8 +201,8 @@ public class BlexProxy {
 
     public static class BlexManufacturerData extends Structure {
         private static final List<String> FIELDS = Arrays.asList("data", "data_length", "manufacturer_id");
-        public int manufacturer_id;
-        public int data_length;
+        public short manufacturer_id;
+        public SizeT data_length;
         public byte data[] = new byte[27]; // 27
 
         @Override
@@ -213,12 +214,25 @@ public class BlexProxy {
     public static class BlexUUID extends Structure {
         private static final List<String> FIELDS = Arrays.asList("value");
         public byte[] value = new byte[37]; // SIMPLEBLE_UUID_STR_LEN
+
         public BlexUUID() {
         }
 
         @Override
         protected List<String> getFieldOrder() {
             return FIELDS;
+        }
+    }
+
+    public static class SizeT extends IntegerType {
+        public SizeT() {
+            super(8, true);
+        }
+    }
+
+    public static class BoolT extends IntegerType {
+        public BoolT() {
+            super(1, true);
         }
     }
 }
