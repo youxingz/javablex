@@ -3,6 +3,7 @@ package io.javablex.nativex;
 import com.sun.jna.*;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class BlexProxy {
     }
 
     public static interface NotifyCallback extends Callback {
-        int invoke(BlexUUID service, BlexUUID characteristic, byte[] data, int data_length, Pointer userdata);
+        int invoke(BlexUUID service, BlexUUID characteristic, byte[] data, long data_length, Pointer userdata);
     }
 
     public static interface PeripheralConnectionCallback extends Callback {
@@ -128,26 +129,21 @@ public class BlexProxy {
 
         int blexPeripheralManufacturerDataGet(Pointer handle, int index, BlexManufacturerData manufacturer_data);
 
-        int blexPeripheralRead(Pointer handle, BlexUUID service, BlexUUID characteristic, Pointer data, // uint8_t**
-                               Pointer data_length);
+        int blexPeripheralRead(Pointer handle, String service, String characteristic, Pointer data_length, Pointer data);
 
-        int blexPeripheralWriteRequest(Pointer handle, BlexUUID service, BlexUUID characteristic, byte[] data, // const uint8_t* data,
-                                       int data_length);
+        int blexPeripheralWriteRequest(Pointer handle, String service, String characteristic, long data_length, byte[] data);
 
-        int blexPeripheralWriteCommand(Pointer handle, BlexUUID service, BlexUUID characteristic, byte[] data, // const uint8_t* data,
-                                       int data_length);
+        int blexPeripheralWriteCommand(Pointer handle, String service, String characteristic, long data_length, byte[] data);
 
-        int blexPeripheralNotify(Pointer handle, BlexUUID service, BlexUUID characteristic, NotifyCallback callback, Pointer userdata);
+        int blexPeripheralNotify(Pointer handle, String service, String characteristic, NotifyCallback callback, Pointer userdata);
 
-        int blexPeripheralIndicate(Pointer handle, BlexUUID service, BlexUUID characteristic, NotifyCallback callback, Pointer userdata);
+        int blexPeripheralIndicate(Pointer handle, String service, String characteristic, NotifyCallback callback, Pointer userdata);
 
-        int blexPeripheralUnsubscribe(Pointer handle, BlexUUID service, BlexUUID characteristic);
+        int blexPeripheralUnsubscribe(Pointer handle, String service, String characteristic);
 
-        int blexPeripheralReadDescriptor(Pointer handle, BlexUUID service, BlexUUID characteristic, BlexUUID descriptor, Pointer data, // uint8_t** data,
-                                         Pointer data_length);
+        int blexPeripheralReadDescriptor(Pointer handle, String service, String characteristic, String descriptor, Pointer data_length, Pointer data);
 
-        int blexPeripheralWriteDescriptor(Pointer handle, BlexUUID service, BlexUUID characteristic, BlexUUID descriptor, byte[] data, // const uint8_t* data,
-                                          int data_length);
+        int blexPeripheralWriteDescriptor(Pointer handle, String service, String characteristic, String descriptor, long data_length, byte[] data);
 
         int blexPeripheralSetCallbackOnConnected(Pointer handle, PeripheralConnectionCallback callback, Pointer userdata);
 
@@ -217,6 +213,17 @@ public class BlexProxy {
 
         public BlexUUID() {
         }
+
+        @Override
+        protected List<String> getFieldOrder() {
+            return FIELDS;
+        }
+    }
+
+    public static class BlexBuffer extends Structure {
+        private static final List<String> FIELDS = Arrays.asList("len", "data");
+        public long len;
+        public byte[] data = new byte[512];
 
         @Override
         protected List<String> getFieldOrder() {

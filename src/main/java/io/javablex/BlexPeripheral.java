@@ -5,8 +5,6 @@ import com.sun.jna.Pointer;
 import io.javablex.nativex.BlexProxy;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class BlexPeripheral {
@@ -112,7 +110,7 @@ public class BlexPeripheral {
     public byte[] read(BlexUUID service, BlexUUID characteristic) {
         Pointer data_ = new Memory(512);
         Pointer length_ = new Memory(4); // 4bytes = 32bits
-        if (0 == proxy.blexPeripheralRead(pointer, service.struct, characteristic.struct, data_, length_)) {
+        if (0 == proxy.blexPeripheralRead(pointer, service.value, characteristic.value, length_, data_)) {
             int len = length_.getInt(0);
             byte[] data = new byte[len];
             // copy data
@@ -125,43 +123,43 @@ public class BlexPeripheral {
     }
 
     public boolean writeRequest(BlexUUID service, BlexUUID characteristic, byte[] data, // const uint8_t* data,
-                                int data_length) {
-        return 0 == proxy.blexPeripheralWriteRequest(pointer, service.struct, characteristic.struct, data, data_length);
+                                long data_length) {
+        return 0 == proxy.blexPeripheralWriteRequest(pointer, service.value, characteristic.value, data_length, data);
     }
 
     public boolean writeCommand(BlexUUID service, BlexUUID characteristic, byte[] data, // const uint8_t* data,
-                                int data_length) {
-        return 0 == proxy.blexPeripheralWriteCommand(pointer, service.struct, characteristic.struct, data, data_length);
+                                long data_length) {
+        return 0 == proxy.blexPeripheralWriteCommand(pointer, service.value, characteristic.value, data_length, data);
     }
 
     public boolean notify(BlexUUID service, BlexUUID characteristic, NotifyCallback callback) {
-        return 0 == proxy.blexPeripheralNotify(pointer, service.struct, characteristic.struct, new BlexProxy.NotifyCallback() {
+        return 0 == proxy.blexPeripheralNotify(pointer, service.value, characteristic.value, new BlexProxy.NotifyCallback() {
             @Override
-            public int invoke(BlexProxy.BlexUUID service, BlexProxy.BlexUUID characteristic, byte[] data, int data_length, Pointer userdata) {
-                callback.onNotify(new BlexUUID(service), new BlexUUID(characteristic), data, data_length, false);
+            public int invoke(BlexProxy.BlexUUID service, BlexProxy.BlexUUID characteristic, byte[] data, long data_length, Pointer userdata) {
+                callback.onNotify(new BlexUUID(service), new BlexUUID(characteristic), data, (int) data_length, false);
                 return 0;
             }
         }, Pointer.NULL);
     }
 
     public boolean indicate(BlexUUID service, BlexUUID characteristic, NotifyCallback callback) {
-        return 0 == proxy.blexPeripheralIndicate(pointer, service.struct, characteristic.struct, new BlexProxy.NotifyCallback() {
+        return 0 == proxy.blexPeripheralIndicate(pointer, service.value, characteristic.value, new BlexProxy.NotifyCallback() {
             @Override
-            public int invoke(BlexProxy.BlexUUID service, BlexProxy.BlexUUID characteristic, byte[] data, int data_length, Pointer userdata) {
-                callback.onNotify(new BlexUUID(service), new BlexUUID(characteristic), data, data_length, true);
+            public int invoke(BlexProxy.BlexUUID service, BlexProxy.BlexUUID characteristic, byte[] data, long data_length, Pointer userdata) {
+                callback.onNotify(new BlexUUID(service), new BlexUUID(characteristic), data, (int) data_length, true);
                 return 0;
             }
         }, Pointer.NULL);
     }
 
     public boolean unsubscribe(BlexUUID service, BlexUUID characteristic) {
-        return 0 == proxy.blexPeripheralUnsubscribe(pointer, service.struct, characteristic.struct);
+        return 0 == proxy.blexPeripheralUnsubscribe(pointer, service.value, characteristic.value);
     }
 
     public BlexDescriptor readDescriptor(BlexUUID service, BlexUUID characteristic, BlexUUID descriptor) {
         Pointer data_ = new Memory(512);
         Pointer length_ = new Memory(4); // 4bytes = 32bits
-        if (0 == proxy.blexPeripheralReadDescriptor(pointer, service.struct, characteristic.struct, descriptor.struct, data_, length_)) {
+        if (0 == proxy.blexPeripheralReadDescriptor(pointer, service.value, characteristic.value, descriptor.value, length_, data_)) {
             int len = length_.getInt(0);
             byte[] data = new byte[len];
             // copy data
@@ -174,7 +172,7 @@ public class BlexPeripheral {
     }
 
     public boolean writeDescriptor(BlexUUID service, BlexUUID characteristic, BlexUUID descriptorUUID, BlexDescriptor descriptor) {
-        return 0 == proxy.blexPeripheralWriteDescriptor(pointer, service.struct, characteristic.struct, descriptorUUID.struct, descriptor.data, descriptor.data.length);
+        return 0 == proxy.blexPeripheralWriteDescriptor(pointer, service.value, characteristic.value, descriptorUUID.value, descriptor.data.length, descriptor.data);
     }
 
     public boolean setCallbackOnConnection(PeripheralConnectionCallback callback) {

@@ -54,11 +54,11 @@ public class BlexAdapter {
         return 0 == proxy.blexAdapterScanFor(pointer, timeout_ms);
     }
 
-    public int getScanResultsCount() {
+    public int getPeripheralsCount() {
         return proxy.blexAdapterScanGetResultsCount(pointer);
     }
 
-    public BlexPeripheral getScanResultsPeripheral(int index) {
+    public BlexPeripheral getPeripheral(int index) {
         return new BlexPeripheral(proxy.blexAdapterScanGetResultsHandle(pointer, index));
     }
 
