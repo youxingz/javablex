@@ -8,6 +8,11 @@ public class BlexAdapter {
     private Pointer pointer;
     private static BlexProxy.Lib proxy = BlexProxy.getInstance();
 
+    private static BlexProxy.AdapterScanCallback adapterScanCallbackOnStart;
+    private static BlexProxy.AdapterScanCallback adapterScanCallbackOnStop;
+    private static BlexProxy.AdapterScanUpdateCallback adapterScanUpdateCallbackOnUpdate;
+    private static BlexProxy.AdapterScanUpdateCallback adapterScanUpdateCallbackOnFound;
+
     private BlexAdapter(Pointer adapter) {
         this.pointer = adapter;
     }
@@ -71,39 +76,31 @@ public class BlexAdapter {
     }
 
     public boolean setCallbackOnScan(AdapterScanCallback callback) {
-        boolean success = 0 == proxy.blexAdapterSetCallbackOnScanStart(pointer, new BlexProxy.AdapterScanCallback() {
-            @Override
-            public int invoke(Pointer adapter, Pointer userdata) {
-                callback.onScanStart(BlexAdapter.this);
-                return 0;
-            }
-        }, Pointer.NULL);
+        adapterScanCallbackOnStart = (adapter, userdata) -> {
+            callback.onScanStart(BlexAdapter.this);
+            return 0;
+        };
+        adapterScanCallbackOnStop = (adapter, userdata) -> {
+            callback.onScanStop(BlexAdapter.this);
+            return 0;
+        };
+        adapterScanUpdateCallbackOnUpdate = (adapter, peripheral, userdata) -> {
+            callback.onDeviceUpdate(BlexAdapter.this, new BlexPeripheral(peripheral));
+            return 0;
+        };
+        adapterScanUpdateCallbackOnFound = (adapter, peripheral, userdata) -> {
+            callback.onDeviceFound(BlexAdapter.this, new BlexPeripheral(peripheral));
+            return 0;
+        };
+        boolean success = 0 == proxy.blexAdapterSetCallbackOnScanStart(pointer, adapterScanCallbackOnStart, Pointer.NULL);
         if (success) {
-            success = 0 == proxy.blexAdapterSetCallbackOnScanStop(pointer, new BlexProxy.AdapterScanCallback() {
-                @Override
-                public int invoke(Pointer adapter, Pointer userdata) {
-                    callback.onScanStop(BlexAdapter.this);
-                    return 0;
-                }
-            }, Pointer.NULL);
+            success = 0 == proxy.blexAdapterSetCallbackOnScanStop(pointer, adapterScanCallbackOnStop, Pointer.NULL);
         }
         if (success) {
-            success = 0 == proxy.blexAdapterSetCallbackOnScanUpdated(pointer, new BlexProxy.AdapterScanUpdateCallback() {
-                @Override
-                public int invoke(Pointer adapter, Pointer peripheral, Pointer userdata) {
-                    callback.onDeviceUpdate(BlexAdapter.this, new BlexPeripheral(peripheral));
-                    return 0;
-                }
-            }, Pointer.NULL);
+            success = 0 == proxy.blexAdapterSetCallbackOnScanUpdated(pointer, adapterScanUpdateCallbackOnUpdate, Pointer.NULL);
         }
         if (success) {
-            success = 0 == proxy.blexAdapterSetCallbackOnScanFound(pointer, new BlexProxy.AdapterScanUpdateCallback() {
-                @Override
-                public int invoke(Pointer adapter, Pointer peripheral, Pointer userdata) {
-                    callback.onDeviceFound(BlexAdapter.this, new BlexPeripheral(peripheral));
-                    return 0;
-                }
-            }, Pointer.NULL);
+            success = 0 == proxy.blexAdapterSetCallbackOnScanFound(pointer, adapterScanUpdateCallbackOnFound, Pointer.NULL);
         }
         return success;
     }

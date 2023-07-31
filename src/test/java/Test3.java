@@ -3,6 +3,7 @@ import io.javablex.BlexAdapter;
 import io.javablex.BlexPeripheral;
 
 import java.util.Arrays;
+import java.util.Date;
 
 public class Test3 {
     private static BlexPeripheral device;
@@ -39,6 +40,7 @@ public class Test3 {
             if (device != null) break;
             Thread.sleep(100);
         }
+        adapter.stopScan();
         System.out.println("Device found!!");
 
         boolean success = device.setCallbackOnConnection(new BlexPeripheral.PeripheralConnectionCallback() {
@@ -83,6 +85,25 @@ public class Test3 {
             byte[] cmdHeart = cmdHeartStr.getBytes();
             device.writeCommand(service.getUuid(), characteristic.getUuid(), cmdHeart, cmdHeart.length);
             Thread.sleep(1000);
+//            break;
         }
+//        final int[] notifyCount = {0};
+//        while (true) {
+//            Thread.sleep(1000);
+////            device.unsubscribe(service.getUuid(), notifyChar.getUuid());
+////            System.out.println("Notify End");
+//            notifyCount[0]++;
+//            device.notify(service.getUuid(), notifyChar.getUuid(), new BlexPeripheral.NotifyCallback() {
+//                private int notifyC = notifyCount[0];
+//                @Override
+//                public void onNotify(BlexPeripheral.BlexUUID service, BlexPeripheral.BlexUUID characteristic, byte[] data, boolean isIndication) {
+//                    System.out.println("==========notify=========>>>>>>>>>>>>>>>>>>" + (notifyC));
+//                    System.out.println("Length: " + data.length);
+//                    System.out.println(System.currentTimeMillis());
+//                    System.out.println(Arrays.toString(data));
+//                }
+//            });
+//            System.out.println("Notify Start Again");
+//        }
     }
 }

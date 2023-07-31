@@ -11,6 +11,9 @@ public class BlexPeripheral {
     private Pointer pointer;
     private static BlexProxy.Lib proxy = BlexProxy.getInstance();
 
+    private static BlexProxy.NotifyCallback notifyCallback;
+    private static BlexProxy.NotifyCallback indicateCallback;
+
     protected BlexPeripheral(Pointer handle) {
         this.pointer = handle;
     }
@@ -133,7 +136,7 @@ public class BlexPeripheral {
     }
 
     public boolean notify(BlexUUID service, BlexUUID characteristic, NotifyCallback callback) {
-        return 0 == proxy.blexPeripheralNotify(pointer, service.value, characteristic.value, new BlexProxy.NotifyCallback() {
+        notifyCallback = new BlexProxy.NotifyCallback() {
             @Override
             public int invoke(String service_, String characteristic_, Pointer dataPointer, long data_length) {
                 byte[] data = new byte[(int) data_length];
@@ -142,11 +145,12 @@ public class BlexPeripheral {
                 callback.onNotify(service, characteristic, data, false);
                 return 0;
             }
-        });
+        };
+        return 0 == proxy.blexPeripheralNotify(pointer, service.value, characteristic.value, notifyCallback);
     }
 
     public boolean indicate(BlexUUID service, BlexUUID characteristic, NotifyCallback callback) {
-        return 0 == proxy.blexPeripheralIndicate(pointer, service.value, characteristic.value, new BlexProxy.NotifyCallback() {
+        indicateCallback = new BlexProxy.NotifyCallback() {
             @Override
             public int invoke(String service_, String characteristic_, Pointer dataPointer, long data_length) {
                 byte[] data = new byte[(int) data_length];
@@ -155,7 +159,8 @@ public class BlexPeripheral {
                 callback.onNotify(service, characteristic, data, true);
                 return 0;
             }
-        });
+        };
+        return 0 == proxy.blexPeripheralIndicate(pointer, service.value, characteristic.value, indicateCallback);
     }
 
     public boolean unsubscribe(BlexUUID service, BlexUUID characteristic) {
