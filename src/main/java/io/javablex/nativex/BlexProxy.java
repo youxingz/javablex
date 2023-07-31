@@ -19,7 +19,7 @@ public class BlexProxy {
                 if (Platform.isIntel()) {
                     file += "_x86_64.dylib"; // Intel
                 } else {
-                    file += "_arm64.dylib"; // M1
+                    file += "_arch64.dylib"; // M1
                 }
             } else if (Platform.isLinux()) {
                 file += ".so";
