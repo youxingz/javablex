@@ -10,6 +10,8 @@ public class Test3 {
 
     public static void main(String[] args) throws InterruptedException {
         BlexAdapter adapter = BlexAdapter.getAdapter(0);
+        System.out.println("Scanner Count: " + adapter.getAdapterCount());
+
         adapter.setCallbackOnScan(new BlexAdapter.AdapterScanCallback() {
             @Override
             public void onScanStart(BlexAdapter adapter) {
@@ -29,7 +31,12 @@ public class Test3 {
             @Override
             public void onDeviceFound(BlexAdapter adapter, BlexPeripheral peripheral) {
                 if (peripheral.getIdentifier() == null) return;
-                if (!peripheral.getIdentifier().startsWith("Cardioflex")) return;
+                if (!peripheral.getAddress().startsWith("58:cf:79:da:b2:7a")) return;
+//                if (!peripheral.getIdentifier().startsWith("Cardioflex")) return;
+                if (peripheral.getServicesCount() == 0) return;
+                BlexPeripheral.BlexService service = peripheral.getServices(0);
+                if (!service.getUuid().toString().startsWith("0000fade")) return;
+                System.out.println(service.getUuid());
                 device = peripheral;
                 System.out.println("Device found!");
             }
@@ -64,15 +71,17 @@ public class Test3 {
 //        byte[] cmd = "{\"cmd\":5}".getBytes(StandardCharsets.US_ASCII);
         byte[] cmd = Native.toByteArray("{\"cmd\":3}");
 //        byte[] cmd = {0x02};
-        BlexPeripheral.BlexService service = device.getServices(0);
+        BlexPeripheral.BlexService service = device.getServices(2);
         BlexPeripheral.BlexCharacteristic characteristic = service.getCharacteristics()[0];
         BlexPeripheral.BlexCharacteristic notifyChar = service.getCharacteristics()[2];
+        BlexPeripheral.BlexUUID serviceUUID = new BlexPeripheral.BlexUUID("0000fade-0000-1000-8000-00805f9b34fb");
+        BlexPeripheral.BlexUUID notifyUUID = new BlexPeripheral.BlexUUID("0000fad3-0000-1000-8000-00805f9b34fb");
         System.out.println("CMD sending...");
         device.writeCommand(service.getUuid(), characteristic.getUuid(), cmd, cmd.length);
 //        device.writeCommand(new BlexPeripheral.BlexUUID("0000fade-0000-1000-8000-00805f9b34fb"), new BlexPeripheral.BlexUUID("0000fad1-0000-1000-8000-00805f9b34fb"), cmd, cmd.length);
         System.out.println("CMD sent.");
 //        Thread.sleep(100000);
-        device.notify(service.getUuid(), notifyChar.getUuid(), new BlexPeripheral.NotifyCallback() {
+        boolean notifySuccess = device.notify(serviceUUID, notifyUUID, new BlexPeripheral.NotifyCallback() {
             @Override
             public void onNotify(BlexPeripheral.BlexUUID service, BlexPeripheral.BlexUUID characteristic, byte[] data, boolean isIndication) {
                 System.out.println("==========notify=========");
@@ -80,6 +89,8 @@ public class Test3 {
                 System.out.println(Arrays.toString(data));
             }
         });
+        System.out.println("Notify Success: " + notifySuccess);
+        System.out.println("Connected? " + device.isConnected());
         while (true) {
             String cmdHeartStr = "{\"cmd\":4,\"secret\":\"xxsecret\",\"ts\":" + System.currentTimeMillis() + "}";
             byte[] cmdHeart = cmdHeartStr.getBytes();
