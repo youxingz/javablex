@@ -98,6 +98,17 @@ public class BlexPeripheral {
         return null;
     }
 
+    public BlexService getServices(BlexUUID uuid) {
+        int count = getServicesCount();
+        for (int i = 0; i < count; i++) {
+            BlexService service = getServices(i);
+            if (service.getUuid().equals(uuid)) {
+                return service;
+            }
+        }
+        return null;
+    }
+
     public int getManufacturerDataCount() {
         return proxy.blexPeripheralManufacturerDataCount(pointer);
     }

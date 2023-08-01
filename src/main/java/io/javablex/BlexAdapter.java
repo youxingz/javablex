@@ -21,11 +21,11 @@ public class BlexAdapter {
         return new BlexAdapter(proxy.blexAdapterGetHandle(index));
     }
 
-    public boolean isBluetoothEnabled() {
+    public static boolean isBluetoothEnabled() {
         return proxy.blexAdapterIsBluetoothEnabled();
     }
 
-    public int getAdapterCount() {
+    public static int getAdapterCount() {
         return proxy.blexAdapterGetCount();
     }
 

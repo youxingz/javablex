@@ -31,8 +31,8 @@ public class Test3 {
             @Override
             public void onDeviceFound(BlexAdapter adapter, BlexPeripheral peripheral) {
                 if (peripheral.getIdentifier() == null) return;
-                if (!peripheral.getAddress().startsWith("58:cf:79:da:b2:7a")) return;
-//                if (!peripheral.getIdentifier().startsWith("Cardioflex")) return;
+//                if (!peripheral.getAddress().startsWith("58:cf:79:da:b2:7a")) return;
+                if (!peripheral.getIdentifier().startsWith("Cardioflex")) return;
                 if (peripheral.getServicesCount() == 0) return;
                 BlexPeripheral.BlexService service = peripheral.getServices(0);
                 if (!service.getUuid().toString().startsWith("0000fade")) return;
@@ -71,7 +71,7 @@ public class Test3 {
 //        byte[] cmd = "{\"cmd\":5}".getBytes(StandardCharsets.US_ASCII);
         byte[] cmd = Native.toByteArray("{\"cmd\":3}");
 //        byte[] cmd = {0x02};
-        BlexPeripheral.BlexService service = device.getServices(2);
+        BlexPeripheral.BlexService service = device.getServices(new BlexPeripheral.BlexUUID("0000fade-0000-1000-8000-00805f9b34fb"));
         BlexPeripheral.BlexCharacteristic characteristic = service.getCharacteristics()[0];
         BlexPeripheral.BlexCharacteristic notifyChar = service.getCharacteristics()[2];
         BlexPeripheral.BlexUUID serviceUUID = new BlexPeripheral.BlexUUID("0000fade-0000-1000-8000-00805f9b34fb");
