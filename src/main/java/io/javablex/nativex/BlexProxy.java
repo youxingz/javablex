@@ -23,11 +23,11 @@ public class BlexProxy {
             } else if (Platform.isLinux()) {
                 file += ".so";
             }
-            instance = NativeUtils.loadLibraryFromJar(file, Lib.class);
             Native.setProtected(true); // avoid crash
             if (!Native.isProtected()) {
-//                System.out.println("JNA Protected is not available.");
+                System.out.println("JNA Protected is not available.");
             }
+            instance = NativeUtils.loadLibraryFromJar(file, Lib.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
