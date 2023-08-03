@@ -3,7 +3,6 @@ package io.javablex.nativex;
 import com.sun.jna.*;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,6 +24,10 @@ public class BlexProxy {
                 file += ".so";
             }
             instance = NativeUtils.loadLibraryFromJar(file, Lib.class);
+            Native.setProtected(true); // avoid crash
+            if (!Native.isProtected()) {
+//                System.out.println("JNA Protected is not available.");
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

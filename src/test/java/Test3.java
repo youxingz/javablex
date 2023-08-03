@@ -69,7 +69,7 @@ public class Test3 {
         System.out.println("Connectable: " + device.isConnectable());
         System.out.println("Connect: " + device.connect());
 //        byte[] cmd = "{\"cmd\":5}".getBytes(StandardCharsets.US_ASCII);
-        byte[] cmd = Native.toByteArray("{\"cmd\":3}");
+        byte[] cmd = Native.toByteArray("{\"cmd\":3,\"req\":233}");
 //        byte[] cmd = {0x02};
         BlexPeripheral.BlexService service = device.getServices(new BlexPeripheral.BlexUUID("0000fade-0000-1000-8000-00805f9b34fb"));
         BlexPeripheral.BlexCharacteristic characteristic = service.getCharacteristics()[0];
@@ -92,7 +92,7 @@ public class Test3 {
         System.out.println("Notify Success: " + notifySuccess);
         System.out.println("Connected? " + device.isConnected());
         while (true) {
-            String cmdHeartStr = "{\"cmd\":4,\"secret\":\"xxsecret\",\"ts\":" + System.currentTimeMillis() + "}";
+            String cmdHeartStr = "{\"cmd\":4,\"req\":233,\"secret\":\"xxsecret\",\"ts\":" + System.currentTimeMillis() + "}";
             byte[] cmdHeart = cmdHeartStr.getBytes();
             device.writeCommand(service.getUuid(), characteristic.getUuid(), cmdHeart, cmdHeart.length);
             Thread.sleep(1000);
