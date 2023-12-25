@@ -8,10 +8,10 @@ public class BlexAdapter {
     private Pointer pointer;
     private static BlexProxy.Lib proxy = BlexProxy.getInstance();
 
-    private static BlexProxy.AdapterScanCallback adapterScanCallbackOnStart;
-    private static BlexProxy.AdapterScanCallback adapterScanCallbackOnStop;
-    private static BlexProxy.AdapterScanUpdateCallback adapterScanUpdateCallbackOnUpdate;
-    private static BlexProxy.AdapterScanUpdateCallback adapterScanUpdateCallbackOnFound;
+    private BlexProxy.AdapterScanCallback adapterScanCallbackOnStart;
+    private BlexProxy.AdapterScanCallback adapterScanCallbackOnStop;
+    private BlexProxy.AdapterScanUpdateCallback adapterScanUpdateCallbackOnUpdate;
+    private BlexProxy.AdapterScanUpdateCallback adapterScanUpdateCallbackOnFound;
 
     private BlexAdapter(Pointer adapter) {
         this.pointer = adapter;

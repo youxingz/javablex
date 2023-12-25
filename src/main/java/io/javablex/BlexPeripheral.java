@@ -11,8 +11,8 @@ public class BlexPeripheral {
     private Pointer pointer;
     private static BlexProxy.Lib proxy = BlexProxy.getInstance();
 
-    private static BlexProxy.NotifyCallback notifyCallback;
-    private static BlexProxy.NotifyCallback indicateCallback;
+    private BlexProxy.NotifyCallback notifyCallback;
+    private BlexProxy.NotifyCallback indicateCallback;
 
     protected BlexPeripheral(Pointer handle) {
         this.pointer = handle;
